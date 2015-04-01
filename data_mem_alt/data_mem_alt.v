@@ -12,6 +12,7 @@ module data_mem_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 29, MEM_DEPTH = 1 
     input [ADDR_WIDTH - 1:0] wr_addr, rd_addr,
     input [DATA_WIDTH - 1:0] wr_data,
     input clk, wr_en, rd_en, reset,
+    output reg rd_data_valid,
     output reg [DATA_WIDTH - 1:0] rd_data
   );
   
@@ -33,7 +34,7 @@ module data_mem_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 29, MEM_DEPTH = 1 
       rd_data <= 29'hZ;
       curr_state <= IDLE;
     end else
-    
+      rd_data_valid <= `DEASSERT_H;
       case (curr_state)
         IDLE:   begin
                   if (wr_en == `ASSERT_L && rd_en == `DEASSERT_L
@@ -62,6 +63,7 @@ module data_mem_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 29, MEM_DEPTH = 1 
                   if (rd_en == `ASSERT_L && prev_rd_addr != rd_addr) begin
                     rd_data <= mem[rd_addr];
                     prev_rd_addr <= rd_addr;
+                    rd_data_valid <= `ASSERT_H;
                   end
                   
                   if (wr_en == `ASSERT_L)
