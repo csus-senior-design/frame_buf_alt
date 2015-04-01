@@ -4,18 +4,20 @@ module data_mem_alt_tb;
   reg clk, wr_en, rd_en, reset;
   reg [2:0] wr_addr, rd_addr;
   reg [15:0] wr_data;
+  wire rd_data_valid;
   wire [15:0] rd_data;
 
   data_mem_alt #(.DATA_WIDTH(16), .ADDR_WIDTH(3))
            uut (.clk(clk), .wr_en(wr_en), .rd_en(rd_en), .reset(reset),
             .wr_addr(wr_addr), .rd_addr(rd_addr), .wr_data(wr_data),
-            .rd_data(rd_data));
+            .rd_data_valid(rd_data_valid), .rd_data(rd_data));
             
   always #10 clk = ~clk;
 
   initial begin
     $monitor("wr_addr: %h, wr_data: %h", wr_addr, wr_data);
-    $monitor("rd_addr: %h, rd_data: %h", rd_addr, rd_data);
+    $monitor("rd_addr: %h, rd_data: %h, rd_data_valid: %h", rd_addr, rd_data,
+              rd_data_valid);
     
     clk = 1'b0;
     wr_data = 16'h1;

@@ -28,32 +28,30 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
     if (reset == `ASSERT)
       curr_state <= IDLE;
     else
-  
-      next_state <= IDLE;
       case (curr_state)
         IDLE:   begin
                   wr_addr <= {ADDR_WIDTH{1'b0}};
                   if (rd_addr <= wr_addr || reset == `ASSERT)
                     mem_rdy <= 1'b0;
                   if (wr_en_in == `ASSERT) begin
-                    next_state <= FILL;
+                    curr_state <= FILL;
                     wr_en <= `ASSERT;
                   end else begin
-                    next_state <= IDLE;
+                    curr_state <= IDLE;
                     wr_en <= `DEASSERT;
                     end
                 end
               
         FILL:   begin
                   if (wr_addr == {ADDR_WIDTH{1'b1}})
-                    next_state <= IDLE;
+                    curr_state <= IDLE;
                   else if (wr_en_in == `ASSERT) begin
-                    next_state <= FILL;
+                    curr_state <= FILL;
                     mem_rdy <= 1'b1;
                     wr_en <= `ASSERT;
                     wr_addr <= wr_addr + 1;
                   end else begin
-                    next_state <= FILL;
+                    curr_state <= FILL;
                     wr_en <= `DEASSERT;
                   end
                 end
@@ -64,28 +62,27 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
     if (reset == `ASSERT)
       rd_curr_state <= IDLE;
     else
-      
       case (rd_curr_state)
         IDLE:   begin
                   rd_addr <= {ADDR_WIDTH{1'b0}};
                   if (rd_en_in == `ASSERT && mem_rdy == 1'b1) begin
-                    rd_next_state <= READ;
+                    rd_curr_state <= READ;
                     rd_en <= `ASSERT;
                   end else begin
-                    rd_next_state <= IDLE;
+                    rd_curr_state <= IDLE;
                     rd_en <= `DEASSERT;
                   end
                 end
               
         READ:   begin
                   if (rd_addr == {ADDR_WIDTH{1'b1}})
-                    rd_next_state <= IDLE;
+                    rd_curr_state <= IDLE;
                   else if (rd_en_in == `ASSERT) begin
-                    rd_next_state <= READ;
+                    rd_curr_state <= READ;
                     rd_en <= `ASSERT;
                     rd_addr <= rd_addr + 1;
                   end else begin
-                    rd_next_state <= READ;
+                    rd_curr_state <= READ;
                     rd_en <= `DEASSERT;
                   end
                 end
