@@ -20,7 +20,7 @@ module data_mem_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 29, MEM_DEPTH = 1 
   
   reg [DATA_WIDTH - 1:0] mem [MEM_DEPTH - 1:0];
   reg [ADDR_WIDTH - 1:0] prev_rd_addr, prev_wr_addr;
-  reg [1:0] curr_state, next_state;
+  reg [1:0] curr_state;
   integer i;
 
   /* Begin interface logic */
@@ -47,20 +47,26 @@ module data_mem_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 29, MEM_DEPTH = 1 
                 end
         
         WRITE:  begin
-                  if (wr_en == `ASSERT_L && rd_en == `DEASSERT_L
-                        && prev_wr_addr != wr_addr) begin
+                  if (wr_en == `ASSERT_L && prev_wr_addr != wr_addr) begin
                     mem[wr_addr] <= wr_data;
                     prev_wr_addr <= wr_addr;
                   end
-                  curr_state <= IDLE;
+                  
+                  if (rd_en == `ASSERT_L)
+                    curr_state <= READ;
+                  else
+                    curr_state <= IDLE;
                 end
         
         READ:   begin
-                  if (rd_en == `ASSERT_L && wr_en == `DEASSERT_L
-                        && prev_rd_addr != rd_addr) begin
+                  if (rd_en == `ASSERT_L && prev_rd_addr != rd_addr) begin
                     rd_data <= mem[rd_addr];
                     prev_rd_addr <= rd_addr;
                   end
+                  
+                  if (wr_en == `ASSERT_L)
+                    curr_state <= WRITE;
+                  else
                     curr_state <= IDLE;
                 end
       endcase

@@ -1,12 +1,12 @@
-`include "frame_buf.v"
+`include "frame_buf_alt.v"
 
-module frame_buf_tb;
+module frame_buf_alt_tb;
 
   reg wr_clk, rd_clk, reset, wr_en_in, rd_en_in;
   reg [23:0] data_in;
   wire [23:0] data_out;
 
-  frame_buf uut(.wr_clk(wr_clk), .rd_clk(rd_clk), .reset(reset),
+  frame_buf_alt uut(.wr_clk(wr_clk), .rd_clk(rd_clk), .reset(reset),
                 .wr_en_in(wr_en_in), .rd_en_in(rd_en_in),
                 .data_in(data_in), .data_out(data_out));
 
