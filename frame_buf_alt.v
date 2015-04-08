@@ -22,7 +22,7 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
   
   reg wr_en, rd_en, mem_rdy;
   reg [ADDR_WIDTH - 1:0] wr_addr, rd_addr;
-  reg curr_state, rd_curr_state, rd_data_valid_reg, rc, wc;
+  reg curr_state, rd_curr_state, rd_data_valid_reg;
   
   data_mem_alt #(.DATA_WIDTH(DATA_WIDTH), .ADDR_WIDTH(ADDR_WIDTH))
            mem (.clk(wr_clk), .wr_en(wr_en), .rd_en(rd_en), .reset(reset),
@@ -84,7 +84,7 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
         READ:   begin
                   if (rd_addr == {ADDR_WIDTH{1'b1}})
                     rd_curr_state <= IDLE;
-                  else if (rd_en_in == `ASSERT_L) begin
+                  else if (rd_en_in == `ASSERT_L && rd_addr < wr_addr) begin
                     rd_curr_state <= READ;
                     rd_en <= `ASSERT_L;
                     rd_addr <= rd_addr + 1;
