@@ -1,6 +1,11 @@
-`ifndef ASSERT
-`define ASSERT 1'b0
-`define DEASSERT 1'b1
+`ifndef ASSERT_L
+`define ASSERT_L 1'b0
+`define DEASSERT_L 1'b1
+`endif
+
+`ifndef ASSERT_H
+`define ASSERT_H 1'b1
+`define DEASSERT_H 1'b0
 `endif
 
 `include "data_mem_alt/data_mem_alt.v"
@@ -25,65 +30,69 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
             .rd_data_valid(rd_data_valid), .rd_data(data_out));
             
   always @(posedge wr_clk) begin
-    if (reset == `ASSERT)
+    if (reset == `ASSERT_L)
       curr_state <= IDLE;
+      wr_en <= `DEASSERT_L;
+      mem_rdy <= `DEASSERT_H;
     else
       case (curr_state)
         IDLE:   begin
                   wr_addr <= {ADDR_WIDTH{1'b0}};
-                  if (rd_addr <= wr_addr || reset == `ASSERT)
+                  if (rd_addr <= wr_addr || reset == `ASSERT_L)
                     mem_rdy <= 1'b0;
-                  if (wr_en_in == `ASSERT) begin
+                  if (wr_en_in == `ASSERT_L) begin
                     curr_state <= FILL;
-                    wr_en <= `ASSERT;
+                    wr_en <= `ASSERT_L;
                   end else begin
                     curr_state <= IDLE;
-                    wr_en <= `DEASSERT;
+                    wr_en <= `DEASSERT_L;
                   end
                 end
               
         FILL:   begin
                   if (wr_addr == {ADDR_WIDTH{1'b1}})
                     curr_state <= IDLE;
-                  else if (wr_en_in == `ASSERT) begin
+                  else if (wr_en_in == `ASSERT_L) begin
                     curr_state <= FILL;
                     mem_rdy <= 1'b1;
-                    wr_en <= `ASSERT;
+                    wr_en <= `ASSERT_L;
                     wr_addr <= wr_addr + 1;
                   end else begin
                     curr_state <= FILL;
-                    wr_en <= `DEASSERT;
+                    wr_en <= `DEASSERT_L;
                   end
                 end
       endcase
   end
   
   always @(posedge rd_clk) begin
-    if (reset == `ASSERT)
+    if (reset == `ASSERT_L)
       rd_curr_state <= IDLE;
+      rd_en <= `DEASSERT_L;
+      rd_addr <= {ADDR_WIDTH{1'b0}};
     else
       case (rd_curr_state)
         IDLE:   begin
                   rd_addr <= {ADDR_WIDTH{1'b0}};
-                  if (rd_en_in == `ASSERT && mem_rdy == 1'b1) begin
+                  if (rd_en_in == `ASSERT_L && mem_rdy == 1'b1) begin
                     rd_curr_state <= READ;
-                    rd_en <= `ASSERT;
+                    rd_en <= `ASSERT_L;
                   end else begin
                     rd_curr_state <= IDLE;
-                    rd_en <= `DEASSERT;
+                    rd_en <= `DEASSERT_L;
                   end
                 end
               
         READ:   begin
                   if (rd_addr == {ADDR_WIDTH{1'b1}})
                     rd_curr_state <= IDLE;
-                  else if (rd_en_in == `ASSERT) begin
+                  else if (rd_en_in == `ASSERT_L) begin
                     rd_curr_state <= READ;
-                    rd_en <= `ASSERT;
+                    rd_en <= `ASSERT_L;
                     rd_addr <= rd_addr + 1;
                   end else begin
                     rd_curr_state <= READ;
-                    rd_en <= `DEASSERT;
+                    rd_en <= `DEASSERT_L;
                   end
                 end
       endcase

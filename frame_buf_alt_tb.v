@@ -3,8 +3,8 @@
 module frame_buf_alt_tb;
 
   reg wr_clk, rd_clk, reset, wr_en_in, rd_en_in;
-  reg [23:0] data_in;
-  wire [23:0] data_out;
+  reg [31:0] data_in;
+  wire [31:0] data_out;
 
   frame_buf_alt uut(.wr_clk(wr_clk), .rd_clk(rd_clk), .reset(reset),
                 .wr_en_in(wr_en_in), .rd_en_in(rd_en_in),
@@ -20,33 +20,35 @@ module frame_buf_alt_tb;
     reset = 1'b0;
     wr_en_in = 1'b1;
     rd_en_in = 1'b1;
-    data_in = 24'h1;
+    data_in = 32'h1;
 
     $monitor("data_out: %h", data_out);
 
     #20 reset = 1'b1;
-    wr_en_in = 1'b0;
+        wr_en_in = 1'b0;
 
-    #20 data_in = 24'h2;
+    #20 data_in = 32'h2;
 
-    #20 data_in = 24'h3;
+    #20 data_in = 32'h3;
 
-    #20 data_in = 24'h4;
-    rd_en_in = 1'b0;
+    #20 data_in = 32'h4;
 
-    #20 data_in = 24'h5;
+    #20 data_in = 32'h5;
 
-    #20 data_in = 24'h6;
+    #20 data_in = 32'h6;
 
-    #20 data_in = 24'h7;
+    #20 data_in = 32'h7;
 
-    #20 data_in = 24'h8;
+    #20 data_in = 32'h8;
 
-    #20 data_in = 24'h9;
+    #20 data_in = 32'h9;
 
-    #20 data_in = 24'hA;
+    #20 data_in = 32'hA;
 
-    #20 $finish;
+    #20 wr_en_in = 1'b1;
+        rd_en_in = 1'b0;
+    
+    #100 $finish;
   end
 
 
