@@ -86,7 +86,7 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
                     rd_curr_state <= IDLE;
                   else if (rd_en_in == `ASSERT_L && ((rd_addr < wr_addr &&
                             rd_c == wr_c) || (rd_addr > wr_addr &&
-                            rd_c != wr_c)) begin
+                            rd_c != wr_c))) begin
                     rd_curr_state <= READ;
                     rd_en <= `ASSERT_L;
                     {rd_c, rd_addr} <= rd_addr + 1;
