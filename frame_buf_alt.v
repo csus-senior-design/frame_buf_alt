@@ -32,13 +32,13 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
   always @(posedge wr_clk) begin
     if (reset == `ASSERT_L) begin
       curr_state <= IDLE;
+      wr_addr <= {ADDR_WIDTH{1'b0}} + 2;
       wr_en <= `DEASSERT_L;
       mem_rdy <= `DEASSERT_H;
       wr_c <= 1'b0;
     end else
       case (curr_state)
         IDLE:   begin
-                  wr_addr <= {ADDR_WIDTH{1'b0}} + 2;
                   if (wr_en_in == `ASSERT_L) begin
                     curr_state <= FILL;
                     wr_en <= `ASSERT_L;
@@ -68,12 +68,11 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
     if (reset == `ASSERT_L) begin
       rd_curr_state <= IDLE;
       rd_en <= `DEASSERT_L;
-      rd_addr <= {ADDR_WIDTH{1'b0}};
+      rd_addr <= {ADDR_WIDTH{1'b0}} + 2;
       rd_c <= 1'b0;
     end else
       case (rd_curr_state)
         IDLE:   begin
-                  rd_addr <= {ADDR_WIDTH{1'b0}} + 2;
                   if (rd_en_in == `ASSERT_L && mem_rdy == 1'b1) begin
                     rd_curr_state <= READ;
                     rd_en <= `ASSERT_L;
@@ -86,6 +85,7 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
         READ:   begin
                   if (rd_addr == {ADDR_WIDTH{1'b1}})
                     rd_curr_state <= IDLE;
+                    {rd_c, rd_addr} <= rd_addr + 1;
                   else if (rd_en_in == `ASSERT_L && ((rd_addr < wr_addr &&
                             rd_c == wr_c) || (rd_addr >= wr_addr &&
                             rd_c != wr_c))) begin
