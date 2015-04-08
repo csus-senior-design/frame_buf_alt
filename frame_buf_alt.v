@@ -22,7 +22,7 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
   
   reg wr_en, rd_en, mem_rdy;
   reg [ADDR_WIDTH - 1:0] wr_addr, rd_addr;
-  reg curr_state, rd_curr_state, rd_data_valid_reg;
+  reg curr_state, rd_curr_state, rd_data_valid_reg, wr_c, rd_c;
   
   data_mem_alt #(.DATA_WIDTH(DATA_WIDTH), .ADDR_WIDTH(ADDR_WIDTH))
            mem (.clk(wr_clk), .wr_en(wr_en), .rd_en(rd_en), .reset(reset),
@@ -54,7 +54,7 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
                     curr_state <= FILL;
                     mem_rdy <= 1'b1;
                     wr_en <= `ASSERT_L;
-                    wr_addr <= wr_addr + 1;
+                    {wr_c, wr_addr} <= wr_addr + 1;
                   end else begin
                     curr_state <= FILL;
                     wr_en <= `DEASSERT_L;
@@ -84,10 +84,12 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
         READ:   begin
                   if (rd_addr == {ADDR_WIDTH{1'b1}})
                     rd_curr_state <= IDLE;
-                  else if (rd_en_in == `ASSERT_L && rd_addr < wr_addr) begin
+                  else if (rd_en_in == `ASSERT_L && ((rd_addr < wr_addr &&
+                            rd_c == wr_c) || (rd_addr > wr_addr &&
+                            rd_c != wr_c)) begin
                     rd_curr_state <= READ;
                     rd_en <= `ASSERT_L;
-                    rd_addr <= rd_addr + 1;
+                    {rd_c, rd_addr} <= rd_addr + 1;
                   end else begin
                     rd_curr_state <= READ;
                     rd_en <= `DEASSERT_L;
