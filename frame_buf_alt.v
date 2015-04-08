@@ -34,6 +34,7 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
       curr_state <= IDLE;
       wr_en <= `DEASSERT_L;
       mem_rdy <= `DEASSERT_H;
+      wr_c <= 1'b0;
     end else
       case (curr_state)
         IDLE:   begin
@@ -68,6 +69,7 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
       rd_curr_state <= IDLE;
       rd_en <= `DEASSERT_L;
       rd_addr <= {ADDR_WIDTH{1'b0}};
+      rd_c <= 1'b0;
     end else
       case (rd_curr_state)
         IDLE:   begin
