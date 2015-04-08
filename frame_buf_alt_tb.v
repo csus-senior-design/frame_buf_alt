@@ -27,7 +27,7 @@ module frame_buf_alt_tb;
     #20 reset = 1'b1;
         wr_en_in = 1'b0;
 
-    #30 data_in = 32'h2;
+    #40 data_in = 32'h2;
 
     #20 data_in = 32'h3;
 
@@ -37,7 +37,7 @@ module frame_buf_alt_tb;
 
     #20 data_in = 32'h6;
 
-    #30 wr_en_in = 1'b1;
+    #20 wr_en_in = 1'b1;
         rd_en_in = 1'b0;
     
     #100 $finish;

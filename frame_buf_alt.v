@@ -18,11 +18,11 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
     output [DATA_WIDTH - 1:0] data_out
   );
   
-  parameter INIT = 2'h0, IDLE = 1'h1, FILL = 1'h2, READ = 1'h2;
+  parameter IDLE = 1'h0, FILL = 1'h1, READ = 1'h1;
   
-  reg wr_en, rd_en, mem_rdy, rd_data_valid_reg, wr_c, rd_c;
+  reg wr_en, rd_en, mem_rdy;
   reg [ADDR_WIDTH - 1:0] wr_addr, rd_addr;
-  reg [1:0] curr_state, rd_curr_state;
+  reg curr_state, rd_curr_state, rd_data_valid_reg, wr_c, rd_c;
   
   data_mem_alt #(.DATA_WIDTH(DATA_WIDTH), .ADDR_WIDTH(ADDR_WIDTH))
            mem (.clk(wr_clk), .wr_en(wr_en), .rd_en(rd_en), .reset(reset),
@@ -31,15 +31,13 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
             
   always @(posedge wr_clk) begin
     if (reset == `ASSERT_L) begin
-      curr_state <= INIT;
+      curr_state <= IDLE;
       wr_addr <= {ADDR_WIDTH{1'b0}} + 2;
       wr_en <= `DEASSERT_L;
       mem_rdy <= `DEASSERT_H;
       wr_c <= 1'b0;
     end else
       case (curr_state)
-        INIT:   curr_state <= IDLE;
-        
         IDLE:   begin
                   if (wr_en_in == `ASSERT_L) begin
                     curr_state <= FILL;
@@ -90,8 +88,8 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
                     rd_curr_state <= IDLE;
                     {rd_c, rd_addr} <= rd_addr + 1;
                   end else if (rd_en_in == `ASSERT_L && ((rd_addr < wr_addr &&
-                                rd_c == wr_c) || (rd_addr >= wr_addr &&
-                                rd_c != wr_c))) begin
+                            rd_c == wr_c) || (rd_addr >= wr_addr &&
+                            rd_c != wr_c))) begin
                     rd_curr_state <= READ;
                     rd_en <= `ASSERT_L;
                     {rd_c, rd_addr} <= rd_addr + 1;
@@ -100,8 +98,6 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
                     rd_en <= `DEASSERT_L;
                   end
                 end
-                
-        default:  curr_state <= IDLE;
       endcase
   end
 
