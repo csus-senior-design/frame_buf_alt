@@ -30,11 +30,11 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
             .rd_data_valid(rd_data_valid), .rd_data(data_out));
             
   always @(posedge wr_clk) begin
-    if (reset == `ASSERT_L)
+    if (reset == `ASSERT_L) begin
       curr_state <= IDLE;
       wr_en <= `DEASSERT_L;
       mem_rdy <= `DEASSERT_H;
-    else
+    end else
       case (curr_state)
         IDLE:   begin
                   wr_addr <= {ADDR_WIDTH{1'b0}};
@@ -66,11 +66,11 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
   end
   
   always @(posedge rd_clk) begin
-    if (reset == `ASSERT_L)
+    if (reset == `ASSERT_L) begin
       rd_curr_state <= IDLE;
       rd_en <= `DEASSERT_L;
       rd_addr <= {ADDR_WIDTH{1'b0}};
-    else
+    end else
       case (rd_curr_state)
         IDLE:   begin
                   rd_addr <= {ADDR_WIDTH{1'b0}};
