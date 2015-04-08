@@ -49,9 +49,10 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
                 end
               
         FILL:   begin
-                  if (wr_addr == {ADDR_WIDTH{1'b1}})
+                  if (wr_addr == {ADDR_WIDTH{1'b1}}) begin
                     curr_state <= IDLE;
-                  else if (wr_en_in == `ASSERT_L) begin
+                    {wr_c, wr_addr} <= wr_addr + 1;
+                  end else if (wr_en_in == `ASSERT_L) begin
                     curr_state <= FILL;
                     mem_rdy <= 1'b1;
                     wr_en <= `ASSERT_L;
@@ -83,10 +84,10 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
                 end
               
         READ:   begin
-                  if (rd_addr == {ADDR_WIDTH{1'b1}})
+                  if (rd_addr == {ADDR_WIDTH{1'b1}}) begin
                     rd_curr_state <= IDLE;
                     {rd_c, rd_addr} <= rd_addr + 1;
-                  else if (rd_en_in == `ASSERT_L && ((rd_addr < wr_addr &&
+                  end else if (rd_en_in == `ASSERT_L && ((rd_addr < wr_addr &&
                             rd_c == wr_c) || (rd_addr >= wr_addr &&
                             rd_c != wr_c))) begin
                     rd_curr_state <= READ;
