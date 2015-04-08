@@ -73,7 +73,7 @@ module data_mem_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 29, MEM_DEPTH = 1 
                   if (wr_en == `ASSERT_L || (rd_en == `ASSERT_L &&
                         wr_en == `ASSERT_L))
                     curr_state <= WRITE;
-                  else if (rd_en == `ASSERT_L;)
+                  else if (rd_en == `ASSERT_L)
                     curr_state <= READ;
                   else
                     curr_state <= IDLE;
