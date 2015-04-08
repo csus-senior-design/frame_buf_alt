@@ -11,7 +11,7 @@
 `include "data_mem_alt/data_mem_alt.v"
 
 module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
-                    MEM_DEPTH = 1 << ADDR_WIDTH, NUM_BUFS = 1)
+                    MEM_DEPTH = 1 << ADDR_WIDTH, NUM_BUFS = 1, BUF_SIZE = 500)
   (
     input wr_clk, rd_clk, reset, wr_en_in, rd_en_in,
     input [DATA_WIDTH - 1:0] data_in,
@@ -20,6 +20,7 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
   
   parameter IDLE = 1'h0, FILL = 1'h1, READ = 1'h1;
   
+  wire wr_rdy;
   reg wr_en, rd_en, mem_rdy;
   reg [ADDR_WIDTH - 1:0] wr_addr, rd_addr;
   reg curr_state, rd_curr_state, rd_data_valid_reg, wr_c, rd_c;
@@ -27,7 +28,8 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
   data_mem_alt #(.DATA_WIDTH(DATA_WIDTH), .ADDR_WIDTH(ADDR_WIDTH))
            mem (.clk(wr_clk), .wr_en(wr_en), .rd_en(rd_en), .reset(reset),
             .wr_addr(wr_addr), .rd_addr(rd_addr), .wr_data(data_in),
-            .rd_data_valid(rd_data_valid), .rd_data(data_out));
+            .rd_data_valid(rd_data_valid), .wr_rdy(wr_rdy),
+            .rd_data(data_out));
             
   always @(posedge wr_clk) begin
     if (reset == `ASSERT_L) begin
@@ -56,7 +58,8 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
                     curr_state <= FILL;
                     mem_rdy <= 1'b1;
                     wr_en <= `ASSERT_L;
-                    {wr_c, wr_addr} <= wr_addr + 1;
+                    if (wr_rdy)
+                      {wr_c, wr_addr} <= wr_addr + 1;
                   end else begin
                     curr_state <= FILL;
                     wr_en <= `DEASSERT_L;
