@@ -39,7 +39,7 @@ module frame_buf_alt_tb;
         wr_en_in = 1'b1;
         rd_en_in = 1'b0;
     
-    #100 $finish;
+    #200 $finish;
   end
 
 

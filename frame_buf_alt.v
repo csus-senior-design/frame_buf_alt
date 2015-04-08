@@ -80,6 +80,7 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
                   if (rd_en_in == `ASSERT_L && mem_rdy == 1'b1) begin
                     rd_curr_state <= READ;
                     rd_en <= `ASSERT_L;
+                    rd_rdy <= `ASSERT_H;
                   end else begin
                     rd_curr_state <= IDLE;
                     rd_en <= `DEASSERT_L;
