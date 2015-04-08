@@ -41,10 +41,10 @@ module data_mem_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 29, MEM_DEPTH = 1 
         IDLE:   begin
                   wr_rdy <= `DEASSERT_H;
                   if (wr_en == `ASSERT_L && rd_en == `DEASSERT_L
-                        && prev_wr_addr != wr_addr)
+                        && prev_wr_addr != wr_addr) begin
                     curr_state <= WRITE;
                     wr_rdy <= `ASSERT_H;
-                  else if (rd_en == `ASSERT_L && wr_en == `DEASSERT_L
+                  end else if (rd_en == `ASSERT_L && wr_en == `DEASSERT_L
                             && prev_rd_addr != rd_addr)
                     curr_state <= READ;
                   else
