@@ -11,7 +11,8 @@
 `include "data_mem_alt/data_mem_alt.v"
 
 module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
-                    MEM_DEPTH = 1 << ADDR_WIDTH, NUM_BUFS = 1, BUF_SIZE = 500)
+                        MEM_DEPTH = 1 << ADDR_WIDTH, NUM_BUFS = 1,
+                        BASE_ADDR = 2, BUF_SIZE = 500)
   (
     input wr_clk, rd_clk, reset, wr_en_in, rd_en_in,
     input [DATA_WIDTH - 1:0] data_in,
@@ -34,7 +35,7 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
   always @(posedge wr_clk) begin
     if (reset == `ASSERT_L) begin
       curr_state <= IDLE;
-      wr_addr <= {ADDR_WIDTH{1'b0}} + 2;
+      wr_addr <= BASE_ADDR;
       wr_en <= `DEASSERT_L;
       mem_rdy <= `DEASSERT_H;
       wr_c <= 1'b0;
@@ -51,7 +52,7 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
                 end
               
         FILL:   begin
-                  if (wr_addr == {ADDR_WIDTH{1'b1}}) begin
+                  if (wr_addr == BASE_ADDR + BUF_SIZE) begin
                     curr_state <= IDLE;
                     {wr_c, wr_addr} <= wr_addr + 1;
                   end else if (wr_en_in == `ASSERT_L) begin
@@ -72,7 +73,7 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
     if (reset == `ASSERT_L) begin
       rd_curr_state <= IDLE;
       rd_en <= `DEASSERT_L;
-      rd_addr <= {ADDR_WIDTH{1'b0}} + 2;
+      rd_addr <= BASE_ADDR;
       rd_c <= 1'b0;
     end else
       case (rd_curr_state)
@@ -87,7 +88,7 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
                 end
               
         READ:   begin
-                  if (rd_addr == {ADDR_WIDTH{1'b1}}) begin
+                  if (rd_addr == BASE_ADDR + BUF_SIZE) begin
                     rd_curr_state <= IDLE;
                     {rd_c, rd_addr} <= rd_addr + 1;
                   end else if (rd_en_in == `ASSERT_L && ((rd_addr < wr_addr &&
