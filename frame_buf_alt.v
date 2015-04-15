@@ -1,3 +1,10 @@
+/*  Instructions
+      Look at frame_buf_alt_tb.v for an example of how this module should be
+      connected with the memory interface. The memory in the testbench is a
+      model of the memory interface written for the Altera Cyclone 5 GX Starter
+      Kit.
+*/
+
 `ifndef ASSERT_L
 `define ASSERT_L 1'b0
 `define DEASSERT_L 1'b1
