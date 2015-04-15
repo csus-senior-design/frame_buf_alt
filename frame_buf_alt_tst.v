@@ -8,20 +8,29 @@
 `define DEASSERT_H 1'b0
 `endif
 
+`include "data_mem_alt/data_mem_alt.v"
+
 module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
-                        MEM_DEPTH = 1 << ADDR_WIDTH, BASE_ADDR = 2,
-                        BUF_SIZE = 500)
+                        MEM_DEPTH = 1 << ADDR_WIDTH, NUM_BUFS = 1,
+                        BASE_ADDR = 2, BUF_SIZE = 500)
   (
-    input wr_clk, rd_clk, reset, wr_en_in, rd_en_in, wr_rdy, rd_rdy,
-    output reg wr_en, rd_en,
-    output reg [ADDR_WIDTH - 1:0] wr_addr, rd_addr
+    input wr_clk, rd_clk, reset, wr_en_in, rd_en_in,
+    input [DATA_WIDTH - 1:0] data_in,
+    output [DATA_WIDTH - 1:0] data_out
   );
   
   parameter IDLE = 1'h0, FILL = 1'h1, READ = 1'h1;
   
+  wire rd_data_valid, wr_rdy, rd_rdy;
   reg wr_en, rd_en, mem_rdy;
   reg [ADDR_WIDTH - 1:0] wr_addr, rd_addr;
   reg curr_state, rd_curr_state, rd_data_valid_reg, wr_c, rd_c;
+  
+  data_mem_alt #(.DATA_WIDTH(DATA_WIDTH), .ADDR_WIDTH(ADDR_WIDTH))
+           mem (.clk(wr_clk), .wr_en(wr_en), .rd_en(rd_en), .reset(reset),
+            .wr_addr(wr_addr), .rd_addr(rd_addr), .wr_data(data_in),
+            .rd_data_valid(rd_data_valid), .wr_rdy(wr_rdy), .rd_rdy(rd_rdy),
+            .rd_data(data_out));
             
   always @(posedge wr_clk) begin
     if (reset == `ASSERT_L) begin

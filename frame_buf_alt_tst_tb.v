@@ -1,35 +1,22 @@
 `include "frame_buf_alt.v"
-`include "data_mem_alt/data_mem_alt.v"
 
-module frame_buf_alt_tb #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3);
+module frame_buf_alt_tb;
 
-  reg wr_clk, rd_clk, mem_clk, reset, wr_en_in, rd_en_in;
+  reg wr_clk, rd_clk, reset, wr_en_in, rd_en_in;
   reg [31:0] data_in;
-  wire wr_rdy, rd_rdy, rd_en, wr_en;
-  wire [ADDR_WIDTH - 1:0] rd_addr, wr_addr;
   wire [31:0] data_out;
 
   frame_buf_alt uut(.wr_clk(wr_clk), .rd_clk(rd_clk), .reset(reset),
-                    .wr_en_in(wr_en_in), .rd_en_in(rd_en_in), .wr_rdy(wr_rdy),
-                    .rd_rdy(rd_rdy), .wr_en(wr_en), .rd_en(rd_en),
-                    .wr_addr(wr_addr), .rd_addr(rd_addr));
-                
-  data_mem_alt #(.DATA_WIDTH(DATA_WIDTH), .ADDR_WIDTH(ADDR_WIDTH))
-               mem (.clk(mem_clk), .wr_en(wr_en), .rd_en(rd_en), .reset(reset),
-                    .wr_addr(wr_addr), .rd_addr(rd_addr), .wr_data(data_in),
-                    .rd_data_valid(rd_data_valid), .wr_rdy(wr_rdy),
-                    .rd_rdy(rd_rdy), .rd_data(data_out));
+                .wr_en_in(wr_en_in), .rd_en_in(rd_en_in),
+                .data_in(data_in), .data_out(data_out));
 
   always #10 wr_clk = ~wr_clk;
 
   always #10 rd_clk = ~rd_clk;
-  
-  always #10 mem_clk = ~mem_clk;
 
   initial begin
     wr_clk = 1'b0;
     rd_clk = 1'b0;
-    mem_clk = 1'b0;
     reset = 1'b0;
     wr_en_in = 1'b1;
     rd_en_in = 1'b1;
