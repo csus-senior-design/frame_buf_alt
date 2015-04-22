@@ -51,7 +51,7 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 29,
         FILL:   begin
                   if (wr_addr == BASE_ADDR + BUF_SIZE) begin
                     curr_state <= IDLE;
-                    wr_addr <= wr_addr + 1;
+                    wr_addr <= BASE_ADDR;
                     wr_c <= ~wr_c;
                   end else if (wr_en_in == `ASSERT_L && ((wr_addr >= rd_addr &&
                                 rd_c == wr_c) || (wr_addr < rd_addr &&
@@ -60,7 +60,12 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 29,
                     mem_rdy <= 1'b1;
                     wr_en <= `ASSERT_L;
                     if (wr_rdy)
-                      wr_addr <= wr_addr + 1;
+                      if (wr_addr == BASE_ADDR + BUF_SIZE) begin
+                        curr_state <= IDLE;
+                        wr_addr <= BASE_ADDR;
+                        wr_c <= ~wr_c;
+                      end else
+                        wr_addr <= wr_addr + 1;
                   end else begin
                     curr_state <= FILL;
                     wr_en <= `DEASSERT_L;
@@ -90,7 +95,7 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 29,
         READ:   begin
                   if (rd_addr == BASE_ADDR + BUF_SIZE) begin
                     rd_curr_state <= IDLE;
-                    rd_addr <= rd_addr + 1;
+                    rd_addr <= BASE_ADDR;
                     rd_c <= ~rd_c;
                   end else if (rd_en_in == `ASSERT_L && ((rd_addr < wr_addr &&
                                 rd_c == wr_c) || (rd_addr >= wr_addr &&
@@ -98,7 +103,12 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 29,
                     rd_curr_state <= READ;
                     rd_en <= `ASSERT_L;
                     if (rd_rdy)
-                      rd_addr <= rd_addr + 1;
+                      if (rd_addr == BASE_ADDR + BUF_SIZE) begin
+                        rd_curr_state <= IDLE;
+                        rd_addr <= BASE_ADDR;
+                        rd_c <= ~rd_c;
+                      end else
+                        rd_addr <= rd_addr + 1;
                   end else begin
                     rd_curr_state <= READ;
                     rd_en <= `DEASSERT_L;
