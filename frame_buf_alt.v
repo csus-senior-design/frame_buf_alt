@@ -15,7 +15,7 @@
 `define DEASSERT_H 1'b0
 `endif
 
-module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
+module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 29,
                         MEM_DEPTH = 1 << ADDR_WIDTH, BASE_ADDR = 2,
                         BUF_SIZE = 500)
   (
@@ -52,8 +52,8 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 3,
                   if (wr_addr == BASE_ADDR + BUF_SIZE) begin
                     curr_state <= IDLE;
                     {wr_c, wr_addr} <= wr_addr + 1;
-                  end else if (wr_en_in == `ASSERT_L && ((rd_addr >= wr_addr &&
-                                rd_c == wr_c) || (rd_addr < wr_addr &&
+                  end else if (wr_en_in == `ASSERT_L && ((wr_addr >= rd_addr &&
+                                rd_c == wr_c) || (wr_addr < rd_addr &&
                                 rd_c != wr_c))) begin
                     curr_state <= FILL;
                     mem_rdy <= 1'b1;
