@@ -17,7 +17,7 @@
 
 module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 29,
                         MEM_DEPTH = 1 << ADDR_WIDTH, BASE_ADDR = 2,
-                        BUF_SIZE = 500)
+                        BUF_SIZE = 5)
   (
     input wr_clk, rd_clk, reset, wr_en_in, rd_en_in, wr_rdy, rd_rdy,
     output reg wr_en, rd_en,
