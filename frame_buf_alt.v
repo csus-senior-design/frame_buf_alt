@@ -1,8 +1,24 @@
-/*  Instructions
-      Look at frame_buf_alt_tb.v for an example of how this module should be
-      connected with the memory interface. The memory in the testbench is a
-      model of the memory interface written for the Altera Cyclone 5 GX Starter
-      Kit.
+/*
+--------------------------------------------------
+Stereoscopic Vision System
+Senior Design Project - Team Honeybadger (Team 11)
+California State University, Sacramento
+Spring 2015 / Fall 2015
+--------------------------------------------------
+
+Stereoscopic Image Capture Top Level Module
+Authors: Padraic Hagerty (guitarisrockin@hotmail.com)
+
+Description:
+  This is the frame buffer designed for the Altera Cyclone 5 GX Starter Kit.
+  It autonomously handles all addressing to the memory based upon the rd_en_in
+  and wr_en_in signals.
+  
+Instructions:
+  Look at frame_buf_alt_tb.v for an example of how this module should be
+  connected with the memory interface. The memory in the testbench is a
+  model of the memory interface written for the Altera Cyclone 5 GX Starter
+  Kit.
 */
 
 `ifndef ASSERT_L
