@@ -33,7 +33,7 @@ Instructions:
 
 module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 29,
                         MEM_DEPTH = 1 << ADDR_WIDTH, BASE_ADDR = 2,
-                        BUF_SIZE = 5)
+                        BUF_SIZE = 230400)
   (
     input wr_clk, rd_clk, reset, wr_en_in, rd_en_in, wr_rdy, rd_rdy,
     output reg wr_en, rd_en,
@@ -69,6 +69,7 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 29,
                     curr_state <= IDLE;
                     wr_addr <= BASE_ADDR;
                     wr_c <= ~wr_c;
+                    wr_en <= `DEASSERT_L;
                   end else if (wr_en_in == `ASSERT_L && ((wr_addr >= rd_addr &&
                                 rd_c == wr_c) || (wr_addr < rd_addr &&
                                 rd_c != wr_c))) begin
@@ -80,6 +81,7 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 29,
                         curr_state <= IDLE;
                         wr_addr <= BASE_ADDR;
                         wr_c <= ~wr_c;
+                        wr_en <= `DEASSERT_L;
                       end else
                         wr_addr <= wr_addr + 1;
                   end else begin
@@ -113,6 +115,7 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 29,
                     rd_curr_state <= IDLE;
                     rd_addr <= BASE_ADDR;
                     rd_c <= ~rd_c;
+                    rd_en <= `DEASSERT_L;
                   end else if (rd_en_in == `ASSERT_L && ((rd_addr < wr_addr &&
                                 rd_c == wr_c) || (rd_addr >= wr_addr &&
                                 rd_c != wr_c))) begin
@@ -123,6 +126,7 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 29,
                         rd_curr_state <= IDLE;
                         rd_addr <= BASE_ADDR;
                         rd_c <= ~rd_c;
+                        rd_en <= `DEASSERT_L;
                       end else
                         rd_addr <= rd_addr + 1;
                   end else begin
