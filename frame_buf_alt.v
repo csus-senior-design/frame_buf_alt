@@ -55,7 +55,9 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 29,
     end else
       case (curr_state)
         IDLE:   begin
-                  if (wr_en_in == `ASSERT_L) begin
+                  if (wr_en_in == `ASSERT_L && ((wr_addr >= rd_addr &&
+                      rd_c == wr_c) || (wr_addr < rd_addr &&
+                      rd_c != wr_c))) begin
                     curr_state <= FILL;
                     wr_en <= `ASSERT_L;
                   end else begin
@@ -101,7 +103,9 @@ module frame_buf_alt #(parameter DATA_WIDTH = 32, ADDR_WIDTH = 29,
     end else
       case (rd_curr_state)
         IDLE:   begin
-                  if (rd_en_in == `ASSERT_L && mem_rdy == 1'b1) begin
+                  if (rd_en_in == `ASSERT_L && mem_rdy == 1'b1 &&
+                      ((rd_addr < wr_addr && rd_c == wr_c) ||
+                      (rd_addr >= wr_addr && rd_c != wr_c))) begin
                     rd_curr_state <= READ;
                     rd_en <= `ASSERT_L;
                   end else begin
