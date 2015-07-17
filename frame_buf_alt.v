@@ -47,6 +47,7 @@ module frame_buf_alt #(
                                   rd_rdy,
   output  reg                     wr_en,
                                   rd_en,
+                                  full,
   output  reg [ADDR_WIDTH - 1:0]  wr_addr,
                                   rd_addr
 );
@@ -68,6 +69,7 @@ module frame_buf_alt #(
       wr_en <= `DEASSERT_L;
       mem_rdy <= `DEASSERT_H;
       wr_c <= 1'b0;
+      full <= `DEASSERT_H;
     end else
       case (curr_state)
         IDLE: begin
@@ -76,9 +78,11 @@ module frame_buf_alt #(
               rd_c != wr_c))) begin
             curr_state <= FILL;
             wr_en <= `ASSERT_L;
+            full <= `DEASSERT_H;
           end else begin
             curr_state <= IDLE;
             wr_en <= `DEASSERT_L;
+            full <= `ASSERT_H;
           end
         end
               
@@ -88,6 +92,7 @@ module frame_buf_alt #(
             wr_addr <= BASE_ADDR;
             wr_c <= ~wr_c;
             wr_en <= `DEASSERT_L;
+            full <= `ASSERT_H;
           end else if (wr_en_in == `ASSERT_L && ((wr_addr >= rd_addr &&
                         rd_c == wr_c) || (wr_addr < rd_addr &&
                         rd_c != wr_c))) begin
@@ -100,6 +105,7 @@ module frame_buf_alt #(
                 wr_addr <= BASE_ADDR;
                 wr_c <= ~wr_c;
                 wr_en <= `DEASSERT_L;
+                full <= `ASSERT_H;
               end else
                 wr_addr <= wr_addr + 1;
           end else begin
