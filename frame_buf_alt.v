@@ -63,7 +63,7 @@ module frame_buf_alt #(
 			rd_done = DEASSERT_H;
 	
 	always @(posedge wr_clk) begin
-		if (reset == ASSERT_L) begin
+		if (~reset) begin
 		
 			curr_state <= IDLE;
 			wr_addr <= BASE_ADDR;
@@ -135,7 +135,7 @@ module frame_buf_alt #(
 	end
 	
 	always @(posedge rd_clk) begin
-		if (reset == ASSERT_L) begin
+		if (~reset) begin
 		
 			rd_curr_state <= IDLE;
 			rd_en <= DEASSERT_L;
