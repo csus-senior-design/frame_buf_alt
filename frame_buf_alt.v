@@ -23,23 +23,23 @@ Instructions:
 
 module frame_buf_alt #(
 	parameter	DATA_WIDTH = 32,
-					ADDR_WIDTH = 29,
-					MEM_DEPTH = 1 << ADDR_WIDTH,
-					BASE_ADDR = 2,
-					BUF_SIZE = 307200
+				ADDR_WIDTH = 29,
+				MEM_DEPTH = 1 << ADDR_WIDTH,
+				BASE_ADDR = 2,
+				BUF_SIZE = 307200
 )(
-	input												wr_clk,
-														rd_clk,
-														reset,
-														wr_en_in,
-														rd_en_in,
-														wr_rdy,
-														rd_rdy,
-	output	reg									wr_en,
-														rd_en,
-														full,
+	input							wr_clk,
+									rd_clk,
+									reset,
+									wr_en_in,
+									rd_en_in,
+									wr_rdy,
+									rd_rdy,
+	output	reg						wr_en,
+									rd_en,
+									full,
 	output	reg	[ADDR_WIDTH - 1:0]	wr_addr,
-														rd_addr
+									rd_addr
 );
 
 	localparam
@@ -96,7 +96,7 @@ module frame_buf_alt #(
 				end
 							
 				FILL: begin
-					if (wr_addr == BASE_ADDR + BUF_SIZE) begin
+					if (wr_addr == BASE_ADDR + BUF_SIZE - 1) begin
 					
 						curr_state <= IDLE;
 						wr_addr <= BASE_ADDR;
@@ -113,7 +113,7 @@ module frame_buf_alt #(
 						wr_en <= ASSERT_L;
 						
 						if (wr_rdy)
-							if (wr_addr == BASE_ADDR + BUF_SIZE) begin
+							if (wr_addr == BASE_ADDR + BUF_SIZE - 1) begin
 								curr_state <= IDLE;
 								wr_addr <= BASE_ADDR;
 								wr_c <= ~wr_c;
@@ -164,7 +164,7 @@ module frame_buf_alt #(
 				end
 							
 				READ: begin
-					if (rd_addr == BASE_ADDR + BUF_SIZE) begin
+					if (rd_addr == BASE_ADDR + BUF_SIZE - 1) begin
 					
 						rd_curr_state <= IDLE;
 						rd_addr <= BASE_ADDR;
@@ -180,7 +180,7 @@ module frame_buf_alt #(
 						rd_en <= ASSERT_L;
 						
 						if (rd_rdy)
-							if (rd_addr == BASE_ADDR + BUF_SIZE) begin
+							if (rd_addr == BASE_ADDR + BUF_SIZE - 1) begin
 								rd_curr_state <= IDLE;
 								rd_addr <= BASE_ADDR;
 								rd_c <= ~rd_c;
