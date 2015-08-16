@@ -56,11 +56,11 @@ module frame_buf_alt #(
 	reg	mem_rdy = 1'b0;
 	(* syn_encoding = "safe" *)
 	reg	curr_state = IDLE,
-			rd_curr_state = IDLE;
+		rd_curr_state = IDLE;
 	reg	rd_data_valid_reg,
-			wr_c = 1'b0,
-			rd_c = 1'b0,
-			rd_done = DEASSERT_H;
+		wr_c = 1'b0,
+		rd_c = 1'b0,
+		rd_done = DEASSERT_H;
 	
 	always @(posedge wr_clk) begin
 		if (~reset) begin
@@ -91,12 +91,11 @@ module frame_buf_alt #(
 						
 						if (rd_done)
 							full <= DEASSERT_H;
-							
 					end
 				end
 							
 				FILL: begin
-					if (wr_addr == BASE_ADDR + BUF_SIZE - 1) begin
+					if (wr_addr == BASE_ADDR + BUF_SIZE) begin
 					
 						curr_state <= IDLE;
 						wr_addr <= BASE_ADDR;
@@ -113,7 +112,7 @@ module frame_buf_alt #(
 						wr_en <= ASSERT_L;
 						
 						if (wr_rdy)
-							if (wr_addr == BASE_ADDR + BUF_SIZE - 1) begin
+							if (wr_addr == BASE_ADDR + BUF_SIZE) begin
 								curr_state <= IDLE;
 								wr_addr <= BASE_ADDR;
 								wr_c <= ~wr_c;
@@ -164,7 +163,7 @@ module frame_buf_alt #(
 				end
 							
 				READ: begin
-					if (rd_addr == BASE_ADDR + BUF_SIZE - 1) begin
+					if (rd_addr == BASE_ADDR + BUF_SIZE) begin
 					
 						rd_curr_state <= IDLE;
 						rd_addr <= BASE_ADDR;
@@ -180,7 +179,7 @@ module frame_buf_alt #(
 						rd_en <= ASSERT_L;
 						
 						if (rd_rdy)
-							if (rd_addr == BASE_ADDR + BUF_SIZE - 1) begin
+							if (rd_addr == BASE_ADDR + BUF_SIZE) begin
 								rd_curr_state <= IDLE;
 								rd_addr <= BASE_ADDR;
 								rd_c <= ~rd_c;
