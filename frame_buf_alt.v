@@ -28,8 +28,7 @@ module frame_buf_alt #(
 				BASE_ADDR = 2,
 				BUF_SIZE = 307200				// 640 * 480 pixels
 )(
-	input							wr_clk,
-									rd_clk,
+	input							clk,
 									reset,
 									wr_en,
 									rd_en,
@@ -65,7 +64,7 @@ module frame_buf_alt #(
 		
 	assign avl_addr = (wr_en) ? rd_addr : wr_addr;
 	
-	always @(posedge wr_clk) begin
+	always @(posedge clk) begin
 		if (~reset) begin
 		
 			curr_state <= IDLE;
@@ -100,7 +99,7 @@ module frame_buf_alt #(
 				end
 							
 				FILL: begin
-					if (wr_addr == BASE_ADDR + BUF_SIZE) begin
+					if (wr_addr == BASE_ADDR + BUF_SIZE - 1) begin
 					
 						curr_state <= IDLE;
 						wr_addr <= BASE_ADDR;
@@ -132,7 +131,7 @@ module frame_buf_alt #(
 			endcase
 	end
 	
-	always @(posedge rd_clk) begin
+	always @(posedge clk) begin
 		if (~reset) begin
 		
 			rd_curr_state <= IDLE;
@@ -167,7 +166,7 @@ module frame_buf_alt #(
 				end
 							
 				READ: begin
-					if (rd_addr == BASE_ADDR + BUF_SIZE) begin
+					if (rd_addr == BASE_ADDR + BUF_SIZE - 1) begin
 					
 						rd_curr_state <= IDLE;
 						rd_addr <= BASE_ADDR;
