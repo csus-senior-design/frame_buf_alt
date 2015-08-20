@@ -53,14 +53,16 @@ module frame_buf_alt #(
 		FILL = 1'h1,
 		READ = 1'h1;
 	
-	reg	mem_rdy = 1'b0;
+	reg						mem_rdy = 1'b0;
 	(* syn_encoding = "safe" *)
-	reg	curr_state = IDLE,
-		rd_curr_state = IDLE;
-	reg	rd_data_valid_reg,
-		wr_c = 1'b0,
-		rd_c = 1'b0,
-		rd_done = DEASSERT_H;
+	reg						curr_state = IDLE,
+							rd_curr_state = IDLE;
+	reg						rd_data_valid_reg,
+							wr_c = 1'b0,
+							rd_c = 1'b0,
+							rd_done = DEASSERT_H;
+	reg	[ADDR_WIDTH - 1:0]	wr_addr_stop,
+							rd_addr_stop;
 		
 	assign avl_addr = (wr_en) ? rd_addr : wr_addr;
 	
@@ -123,6 +125,8 @@ module frame_buf_alt #(
 						curr_state <= FILL;
 						//wr_en <= DEASSERT_L;
 						avl_write_req <= DEASSERT_H;
+						if (!avl_ready && avl_write_req)
+							wr_addr <= wr_addr - 2;
 						
 					end
 					
@@ -190,6 +194,8 @@ module frame_buf_alt #(
 						rd_curr_state <= READ;
 						//rd_en <= DEASSERT_L;
 						avl_read_req <= DEASSERT_H;
+						if (!avl_ready && avl_read_req)
+							rd_addr <= rd_addr - 2;
 					end
 					
 				end
