@@ -53,7 +53,8 @@ module frame_buf_alt #(
 		FILL = 1'h1,
 		READ = 1'h1;
 	
-	reg						mem_rdy = 1'b0;
+	//reg						mem_rdy = 1'b0;
+	reg						mem_rdy = 1'b1;
 	(* syn_encoding = "safe" *)
 	reg						curr_state = IDLE,
 							rd_curr_state = IDLE;
@@ -71,7 +72,8 @@ module frame_buf_alt #(
 		
 			curr_state <= IDLE;
 			wr_addr <= BASE_ADDR;
-			mem_rdy <= DEASSERT_H;
+			//mem_rdy <= DEASSERT_H;
+			mem_rdy <= ASSERT_H;
 			wr_c <= 1'b0;
 			full <= DEASSERT_H;
 			avl_write_req <= DEASSERT_H;
@@ -80,6 +82,9 @@ module frame_buf_alt #(
 		
 			case (curr_state)
 				IDLE: begin
+					if (rd_done)
+							full <= DEASSERT_H;
+				
 					if (wr_en == ASSERT_L && avl_ready &&
 							((wr_addr >= rd_addr && rd_c == wr_c) ||
 							(wr_addr < rd_addr && rd_c != wr_c))) begin
@@ -87,7 +92,6 @@ module frame_buf_alt #(
 						curr_state <= FILL;
 						//wr_en <= ASSERT_L;
 						avl_write_req <= ASSERT_H;
-						full <= DEASSERT_H;
 						
 					end else begin
 					
@@ -95,8 +99,6 @@ module frame_buf_alt #(
 						//wr_en <= DEASSERT_L;
 						avl_write_req <= DEASSERT_H;
 						
-						if (rd_done)
-							full <= DEASSERT_H;
 					end
 				end
 							
@@ -115,7 +117,7 @@ module frame_buf_alt #(
 									(wr_addr < rd_addr && rd_c != wr_c))) begin
 												
 						curr_state <= FILL;
-						mem_rdy <= 1'b1;
+						//mem_rdy <= 1'b1;
 						//wr_en <= ASSERT_L;
 						avl_write_req <= ASSERT_H;
 						wr_addr <= wr_addr + 1;
@@ -149,9 +151,9 @@ module frame_buf_alt #(
 			case (rd_curr_state)
 				IDLE: begin
 					if (rd_en == ASSERT_L && mem_rdy == 1'b1 &&
-							wr_en == DEASSERT_L && avl_ready &&
+							wr_en == DEASSERT_L && avl_ready/* &&
 							((rd_addr < wr_addr && rd_c == wr_c) ||
-							(rd_addr >= wr_addr && rd_c != wr_c))) begin
+							(rd_addr >= wr_addr && rd_c != wr_c))*/) begin
 							
 						rd_curr_state <= READ;
 						//rd_en <= ASSERT_L;
@@ -180,9 +182,9 @@ module frame_buf_alt #(
 						rd_done <= ASSERT_H;
 						
 					end else if (rd_en == ASSERT_L && wr_en == DEASSERT_L &&
-									avl_ready &&
+									avl_ready/* &&
 									((rd_addr < wr_addr && rd_c == wr_c) ||
-									(rd_addr >= wr_addr && rd_c != wr_c)))
+									(rd_addr >= wr_addr && rd_c != wr_c))*/)
 																		begin
 						
 						rd_curr_state <= READ;
