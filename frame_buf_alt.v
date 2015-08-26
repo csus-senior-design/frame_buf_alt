@@ -36,7 +36,8 @@ module frame_buf_alt #(
 									avl_ready,
 	output	reg						avl_write_req,
 									avl_read_req,
-									full,
+									full = DEASSERT_H,
+									rd_done = DEASSERT_H,
 	output	reg	[ADDR_WIDTH - 1:0]	wr_addr,
 									rd_addr,
 	output		[ADDR_WIDTH - 1:0]	avl_addr
@@ -60,8 +61,7 @@ module frame_buf_alt #(
 							rd_curr_state = IDLE;
 	reg						rd_data_valid_reg,
 							wr_c = 1'b0,
-							rd_c = 1'b0,
-							rd_done = DEASSERT_H;
+							rd_c = 1'b0;
 	reg	[ADDR_WIDTH - 1:0]	wr_addr_stop,
 							rd_addr_stop;
 		
