@@ -82,16 +82,16 @@ module frame_buf_alt #(
 		
 			case (curr_state)
 				IDLE: begin
-					if (rd_done)
-							full <= DEASSERT_H;
-				
-					if (wr_en == ASSERT_L && avl_ready &&
+					full <= DEASSERT_H;
+					
+					if (wr_en == ASSERT_L && avl_ready/* &&
 							((wr_addr >= rd_addr && rd_c == wr_c) ||
-							(wr_addr < rd_addr && rd_c != wr_c))) begin
+							(wr_addr < rd_addr && rd_c != wr_c))*/) begin
 							
 						curr_state <= FILL;
 						//wr_en <= ASSERT_L;
 						avl_write_req <= ASSERT_H;
+						//full <= DEASSERT_H;
 						
 					end else begin
 					
@@ -112,9 +112,9 @@ module frame_buf_alt #(
 						avl_write_req <= DEASSERT_H;
 						full <= ASSERT_H;
 						
-					end else if (wr_en == ASSERT_L && avl_ready &&
+					end else if (wr_en == ASSERT_L && avl_ready/* &&
 									((wr_addr >= rd_addr && rd_c == wr_c) ||
-									(wr_addr < rd_addr && rd_c != wr_c))) begin
+									(wr_addr < rd_addr && rd_c != wr_c))*/) begin
 												
 						curr_state <= FILL;
 						//mem_rdy <= 1'b1;
@@ -150,6 +150,8 @@ module frame_buf_alt #(
 		
 			case (rd_curr_state)
 				IDLE: begin
+					rd_done <= DEASSERT_H;
+				
 					if (rd_en == ASSERT_L && mem_rdy == 1'b1 &&
 							wr_en == DEASSERT_L && avl_ready/* &&
 							((rd_addr < wr_addr && rd_c == wr_c) ||
@@ -158,15 +160,15 @@ module frame_buf_alt #(
 						rd_curr_state <= READ;
 						//rd_en <= ASSERT_L;
 						avl_read_req <= ASSERT_H;
-						rd_done <= DEASSERT_H;
+						//rd_done <= DEASSERT_H;
 						
 					end else begin
 					
 						rd_curr_state <= IDLE;
 						//rd_en <= DEASSERT_L;
 						avl_read_req <= DEASSERT_H;
-						if (wr_en)
-							rd_done <= DEASSERT_H;
+						//if (~wr_en)
+						//	rd_done <= DEASSERT_H;
 						
 					end
 				end
