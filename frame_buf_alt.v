@@ -127,8 +127,8 @@ module frame_buf_alt #(
 						curr_state <= FILL;
 						//wr_en <= DEASSERT_L;
 						avl_write_req <= DEASSERT_H;
-						if (!avl_ready && avl_write_req)
-							wr_addr <= wr_addr - 2;
+						//if (!avl_ready && avl_write_req)
+							//wr_addr <= wr_addr - 2;
 						
 					end
 					
@@ -198,8 +198,8 @@ module frame_buf_alt #(
 						rd_curr_state <= READ;
 						//rd_en <= DEASSERT_L;
 						avl_read_req <= DEASSERT_H;
-						if (!avl_ready && avl_read_req)
-							rd_addr <= rd_addr - 2;
+						//if (!avl_ready && avl_read_req)
+						//	rd_addr <= rd_addr - 2;
 					end
 					
 				end
