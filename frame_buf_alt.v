@@ -65,7 +65,7 @@ module frame_buf_alt #(
 	reg	[ADDR_WIDTH - 1:0]	wr_addr_stop,
 							rd_addr_stop;
 		
-	assign avl_addr = (wr_en) ? rd_addr : wr_addr;
+	assign avl_addr = (avl_read_req) ? rd_addr : wr_addr;
 	
 	always @(posedge clk) begin
 		if (~reset) begin
