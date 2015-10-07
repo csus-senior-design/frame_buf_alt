@@ -92,134 +92,65 @@ module frame_buf_alt #(
 			full <= DEASSERT_H;
 			//avl_write_req <= DEASSERT_H;
 			
-		end else if (ram_rdy)
-		
-			case (curr_state)
-				IDLE: begin
-					full <= DEASSERT_H;
-					
-					if (wr_en == ASSERT_L && avl_ready/* &&
+		end else if (ram_rdy) begin
+			full <= DEASSERT_H;
+				
+			if (wr_addr == BASE_ADDR + BUF_SIZE - 1) begin
+			
+				wr_addr <= BASE_ADDR;
+				wr_c <= ~wr_c;
+				//wr_en <= DEASSERT_L;
+				//avl_write_req <= DEASSERT_H;
+				full <= ASSERT_H;
+				
+			end else if (wr_en == ASSERT_L && avl_ready/* &&
 							((wr_addr >= rd_addr && rd_c == wr_c) ||
 							(wr_addr < rd_addr && rd_c != wr_c))*/) begin
-							
-						curr_state <= FILL;
-						//wr_en <= ASSERT_L;
-						//avl_write_req <= ASSERT_H;
-						//full <= DEASSERT_H;
+										
+				//mem_rdy <= 1'b1;
+				//wr_en <= ASSERT_L;
+				//avl_write_req <= ASSERT_H;
+				wr_addr <= wr_addr + 1;
 						
-					end else begin
-					
-						curr_state <= IDLE;
-						//wr_en <= DEASSERT_L;
-						//avl_write_req <= DEASSERT_H;
-						
-					end
-				end
-							
-				FILL: begin
-					if (wr_addr == BASE_ADDR + BUF_SIZE - 1) begin
-					
-						curr_state <= IDLE;
-						wr_addr <= BASE_ADDR;
-						wr_c <= ~wr_c;
-						//wr_en <= DEASSERT_L;
-						//avl_write_req <= DEASSERT_H;
-						full <= ASSERT_H;
-						
-					end else if (wr_en == ASSERT_L && avl_ready/* &&
-									((wr_addr >= rd_addr && rd_c == wr_c) ||
-									(wr_addr < rd_addr && rd_c != wr_c))*/) begin
-												
-						curr_state <= FILL;
-						//mem_rdy <= 1'b1;
-						//wr_en <= ASSERT_L;
-						//avl_write_req <= ASSERT_H;
-						wr_addr <= wr_addr + 1;
-								
-					end else begin
-					
-						curr_state <= FILL;
-						//wr_en <= DEASSERT_L;
-						//avl_write_req <= DEASSERT_H;
-						//if (!avl_ready && avl_write_req)
-							//wr_addr <= wr_addr - 2;
-						
-					end
-					
-				end
-				
-			endcase
+			end
+			
+		end
+		
 	end
 	
 	always @(posedge clk) begin
 		if (~reset) begin
 		
-			rd_curr_state <= IDLE;
 			rd_addr <= BASE_ADDR;
 			rd_c <= 1'b0;
 			rd_done <= DEASSERT_H;
 			//avl_read_req <= DEASSERT_H;
 			
-		end else if (ram_rdy)
-		
-			case (rd_curr_state)
-				IDLE: begin
-					rd_done <= DEASSERT_H;
-				
-					if (rd_en == ASSERT_L && mem_rdy == 1'b1 &&
-							wr_en == DEASSERT_L && avl_ready/* &&
-							((rd_addr < wr_addr && rd_c == wr_c) ||
-							(rd_addr >= wr_addr && rd_c != wr_c))*/) begin
-							
-						rd_curr_state <= READ;
-						//rd_en <= ASSERT_L;
-						//avl_read_req <= ASSERT_H;
-						//rd_done <= DEASSERT_H;
-						
-					end else begin
-					
-						rd_curr_state <= IDLE;
-						//rd_en <= DEASSERT_L;
-						//avl_read_req <= DEASSERT_H;
-						//if (~wr_en)
-						//	rd_done <= DEASSERT_H;
-						
-					end
-				end
-							
-				READ: begin
-					if (rd_addr == BASE_ADDR + BUF_SIZE - 1) begin
-					
-						rd_curr_state <= IDLE;
-						rd_addr <= BASE_ADDR;
-						rd_c <= ~rd_c;
-						//rd_en <= DEASSERT_L;
-						//avl_read_req <= DEASSERT_H;
-						rd_done <= ASSERT_H;
-						
-					end else if (rd_en == ASSERT_L && wr_en == DEASSERT_L &&
-									avl_ready/* &&
-									((rd_addr < wr_addr && rd_c == wr_c) ||
-									(rd_addr >= wr_addr && rd_c != wr_c))*/)
-																		begin
-						
-						rd_curr_state <= READ;
-						//rd_en <= ASSERT_L;
-						//avl_read_req <= ASSERT_H;
-						rd_addr <= rd_addr + 1;
-					
-					end else begin
-						rd_curr_state <= READ;
-						//rd_en <= DEASSERT_L;
-						//avl_read_req <= DEASSERT_H;
-						//if (!avl_ready && avl_read_req)
-						//	rd_addr <= rd_addr - 2;
-					end
-					
-				end
-				
-			endcase
+		end else if (ram_rdy) begin
+			rd_done <= DEASSERT_H;
 			
+			if (rd_addr == BASE_ADDR + BUF_SIZE - 1) begin
+			
+				rd_addr <= BASE_ADDR;
+				rd_c <= ~rd_c;
+				//rd_en <= DEASSERT_L;
+				//avl_read_req <= DEASSERT_H;
+				rd_done <= ASSERT_H;
+				
+			end else if (rd_en == ASSERT_L && wr_en == DEASSERT_L &&
+							avl_ready/* &&
+							((rd_addr < wr_addr && rd_c == wr_c) ||
+							(rd_addr >= wr_addr && rd_c != wr_c))*/)
+																begin
+				
+				//rd_en <= ASSERT_L;
+				//avl_read_req <= ASSERT_H;
+				rd_addr <= rd_addr + 1;
+			
+			end
+			
+		end
+		
 	end
 
 endmodule
