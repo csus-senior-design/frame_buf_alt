@@ -68,17 +68,22 @@ module frame_buf_alt #(
 	assign avl_addr = (avl_read_req) ? rd_addr : wr_addr;
 	
 	always @(*) begin
-		if (wr_en == ASSERT_L && avl_ready &&
-				wr_addr < BASE_ADDR + BUF_SIZE - 1 && rd_en != ASSERT_L)
-			avl_write_req = ASSERT_H;
-		else
+		if (~reset) begin
 			avl_write_req = DEASSERT_H;
-		
-		if (rd_en == ASSERT_L && avl_ready &&
-				rd_addr < BASE_ADDR + BUF_SIZE - 1 && wr_en != ASSERT_L)
-			avl_read_req = ASSERT_H;
-		else
 			avl_read_req = DEASSERT_H;
+		end else begin
+			if (wr_en == ASSERT_L && avl_ready &&
+					wr_addr < BASE_ADDR + BUF_SIZE && rd_en != ASSERT_L)
+				avl_write_req = ASSERT_H;
+			else
+				avl_write_req = DEASSERT_H;
+			
+			if (rd_en == ASSERT_L && avl_ready &&
+					rd_addr < BASE_ADDR + BUF_SIZE && wr_en != ASSERT_L)
+				avl_read_req = ASSERT_H;
+			else
+				avl_read_req = DEASSERT_H;
+		end
 	end
 	
 	always @(posedge clk) begin
@@ -95,7 +100,7 @@ module frame_buf_alt #(
 		end else if (ram_rdy) begin
 			full <= DEASSERT_H;
 				
-			if (wr_addr == BASE_ADDR + BUF_SIZE - 1) begin
+			if (wr_addr == BASE_ADDR + BUF_SIZE) begin
 			
 				wr_addr <= BASE_ADDR;
 				wr_c <= ~wr_c;
@@ -129,7 +134,7 @@ module frame_buf_alt #(
 		end else if (ram_rdy) begin
 			rd_done <= DEASSERT_H;
 			
-			if (rd_addr == BASE_ADDR + BUF_SIZE - 1) begin
+			if (rd_addr == BASE_ADDR + BUF_SIZE) begin
 			
 				rd_addr <= BASE_ADDR;
 				rd_c <= ~rd_c;
